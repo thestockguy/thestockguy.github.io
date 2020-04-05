@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Bloodmap</title>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+  <a id="openBloodmap" href="http://hisz.rsoe.hu/alertmap/index2.php" style="display: none" target="_blank"></a>
+
+  <script type="text/javascript">
+
+      var ghosts = [];
+      var stones = [];
+      var twitchData = {"total": 0, "souls": [], "cursor": ""};
+      var screenWidth = window.innerWidth;
+      var screenHeight = window.innerHeight;
+
+
+
+      var config = {
+          debug: true,
+          type: Phaser.AUTO,
+          width: window.innerWidth,
+          height: window.innerHeight,
+          scale: {
+              mode: Phaser.Scale.FIT,
+              autoCenter: Phaser.Scale.CENTER_BOTH
+          },
+          scene: {
+              preload: preload,
+              create: create,
+              update: update
+          }
+      };
+
+      var game = new Phaser.Game(config);
+
+      function preload ()
+      {
+          this.load.image('background', 'img/graveyard_empty.png');
+          this.load.image('ui_overlay', 'img/ui_overlay.png');
+          this.load.image('angel', 'img/graveyard_angel.png');
+          this.load.image('angel_panel', 'img/graveyard_angel_panel.png');
+          this.load.image('door', 'img/graveyard_door.png');
+          this.load.image('room', 'img/graveyard_room.png');
+          this.load.image('stone_1', 'img/graveyard_stone_1.png');
+          this.load.image('stone_2', 'img/graveyard_stone_2.png');
+          this.load.image('stone_3', 'img/graveyard_stone_3.png');
+          this.load.image('stone_4', 'img/graveyard_stone_4.png');
+          this.load.image('stone_panel', 'img/graveyard_stone_panel.png');
+          this.load.image('ghost', 'img/graveyard_ghost.png');
+      }
+
+      function create ()
+      {
+          gameContext = this;
+
+          this.bg = this.add.image(screenWidth / 2, screenHeight / 2, 'background');
+          this.bg.setDisplaySize(screenWidth, screenHeight);
+          this.bg.setDepth(0);
+
+          UIOverlay = this.add.image(screenWidth / 2, screenHeight / 2, 'ui_overlay');
+          UIOverlay.setDisplaySize(screenWidth, screenHeight);
+          UIOverlay.setAlpha(0);
+          UIOverlay.setDepth(100);
+          UIOverlay.setInteractive();
+          UIOverlay.on('pointerdown', function(pointer, gameObject){
+              toggleStonePanel(false);
+              toggleAngelPanel(false);
+          });
+
+
+          angel = this.add.image(placeResponsive(200, "width"), placeResponsive(300, "height"), 'angel');
+          angel.setScale(placeResponsive(0.6, "width"), placeResponsive(0.6, "height"));
+          angel.setInteractive();
+          angel.on('pointerover', function(pointer, gameObject){
+              angel.setScale(placeResponsive(0.62, "width"), placeResponsive(0.62, "height"));
+          });
+          angel.on('pointerout', function(pointer, gameObject){
+              angel.setScale(placeResponsive(0.6, "width"), placeResponsive(0.6, "height"));
+          });
+          angel.on('pointerdown', function(pointer, gameObject){
+              toggleAngelPanel(true);
+          });
+          angel.setDepth(3);
+
+          door = this.add.image(placeResponsive(710, "width"), placeResponsive(398, "height"), 'door');
+          door.setScale(placeResponsive(0.4, "width"), placeResponsive(0.4, "height"));
+          door.setInteractive();
+          door.on('pointerover', function(pointer, gameObject){
+              door.setScale(placeResponsive(0.42, "width"), placeResponsive(0.42, "height"));
+          });
+          door.on('pointerout', function(pointer, gameObject){
+              door.setScale(placeResponsive(0.4, "width"), placeResponsive(0.4, "height"));
+          });
+          door.on('pointerdown', function(pointer, gameObject){
+              document.getElementById("openBloodmap").click();
+          });
+          door.setDepth(0);
+
+          room = this.add.image(placeResponsive(1400, "width"), placeResponsive(300, "height"), 'room');
+          room.setScale(placeResponsive(0.4, "width"), placeResponsive(0.4, "height"));
+          room.setInteractive();
+          //room.on('pointerover', function(pointer, gameObject){
+          //    room.setScale(0.42);
+          //});
+          //room.on('pointerout', function(pointer, gameObject){
+          //    room.setScale(0.4);
+          //});
+          room.setDepth(1);
+
+          stones.push(this.add.image(placeResponsive(200, "width"), placeResponsive(600, "height"), 'stone_1'));
+          stones[0].setScale(placeResponsive(0.4, "width"), placeResponsive(0.4, "height"));
+          stones[0].setDepth(6);
+
+          stones.push(this.add.image(placeResponsive(400, "width"), placeResponsive(525, "height"), 'stone_2'));
+          stones[1].setScale(placeResponsive(0.4, "width"), placeResponsive(0.4, "height"));
+          stones[1].setDepth(4);
+
+          stones.push(this.add.image(placeResponsive(590, "width"), placeResponsive(625, "height"), 'stone_3'));
+          stones[2].setScale(placeResponsive(0.4, "width"), placeResponsive(0.4, "height"));
+          stones[2].setDepth(6);
+
+          stones.push(this.add.image(placeResponsive(1550, "width"), placeResponsive(650, "height"), 'stone_4'));
+          stones[3].setScale(placeResponsive(0.4, "width"), placeResponsive(0.4, "height"));
+          stones[3].flipX = false;
+          stones[3].setDepth(7);
+
+          stones.push(this.add.image(placeResponsive(1100, "width"), placeResponsive(550, "height"), 'stone_1'));
+          stones[4].setScale(placeResponsive(0.4, "width"), placeResponsive(0.4, "height"));
+          stones[4].flipX = true;
+          stones[4].setDepth(5);
+
+          stones.push(this.add.image(placeResponsive(1350, "width"), placeResponsive(500, "height"), 'stone_2'));
+          stones[5].setScale(placeResponsive(0.4, "width"), placeResponsive(0.4, "height"));
+          stones[5].flipX = true;
+          stones[5].setDepth(4);
+
+          stone_panel = this.add.image(screenWidth / 2, screenHeight / 2, 'stone_panel');
+          stone_panel.setScale(placeResponsive(0.9, "width"), placeResponsive(0.9, "height"));
+          stone_panel.setAlpha(0);
+          stone_panel.setDepth(101);
+          stone_panel.setInteractive();
+
+          stone_panel_title = this.add.text(stone_panel.x, stone_panel.y - placeResponsive(80, "height"), "Here lies", { fontFamily: 'Arial', color: '#6B5578', fontSize: "40px" });
+          stone_panel_title.setDepth(101);
+          stone_panel_title.setOrigin(0.5);
+          stone_panel_title.setScale(placeResponsive(1, "width"), placeResponsive(1, "height"));
+          stone_panel_title.setAlpha(0);
+          stone_panel_titlename = this.add.text(stone_panel.x, stone_panel.y - placeResponsive(40, "height"), "", { fontFamily: 'Arial', color: '#6B5578', fontSize: "30px" });
+          stone_panel_titlename.setDepth(101);
+          stone_panel_titlename.setOrigin(0.5);
+          stone_panel_titlename.setScale(placeResponsive(1, "width"), placeResponsive(1, "height"));
+          stone_panel_titlename.setAlpha(0);
+          stone_panel_message = this.add.text(stone_panel.x, stone_panel.y, "", { align: 'center', fontFamily: 'Arial', color: '#6B5578', fontSize: "24px", wordWrap: {width: stone_panel.width / 2.5}});
+          stone_panel_message.setDepth(101);
+          stone_panel_message.setOrigin(0.5, 0);
+          stone_panel_message.setScale(placeResponsive(1, "width"), placeResponsive(1, "height"));
+          stone_panel_message.setAlpha(0);
+
+          angel_panel = this.add.image(screenWidth / 2, screenHeight / 2, 'angel_panel');
+          angel_panel.setScale(placeResponsive(0.9, "width"), placeResponsive(0.9, "height"));
+          angel_panel.setAlpha(0);
+          angel_panel.setDepth(101);
+          angel_panel.setInteractive();
+          angel_panel_message = this.add.text(angel_panel.x, angel_panel.y, "0 Souls have been sacrificed", { align: 'center', fontFamily: 'Arial', color: '#2B5376', fontSize: "40px", wordWrap: {width: angel_panel.width / 2.5}});
+          angel_panel_message.setDepth(101);
+          angel_panel_message.setOrigin(0.5, 0.5);
+          angel_panel_message.setScale(placeResponsive(1, "width"), placeResponsive(1, "height"));
+          angel_panel_message.setAlpha(0);
+
+          this.cursors = this.input.keyboard.createCursorKeys();
+          updateTwitchData(this);
+          addGhost(this);
+      }
+
+      function update ()
+      {
+        for (var i = 0; i < ghosts.length; i++){
+          if(ghosts[i].Anim === "move"){
+            moveGhost(ghosts[i], this);
+          }else if(ghosts[i].Anim === "spawn"){
+            if (spawnGhost(ghosts[i], this)){
+              ghosts[i].Anim = "move";
+            }
+          }else if(ghosts[i].Anim === "die"){
+            dieGhost(ghosts[i], this);
+          }
+        }
+      }
+
+      function toggleStonePanel(state, name = "Bruce", message = "for spy calls"){
+        if (state){
+          stone_panel_titlename.setText(name);
+          stone_panel_message.setText(message);
+          UIOverlay.setAlpha(0.3);
+          stone_panel.setAlpha(1);
+          stone_panel_title.setAlpha(1);
+          stone_panel_titlename.setAlpha(1);
+          stone_panel_message.setAlpha(1);
+        }else{
+          UIOverlay.setAlpha(0);
+          stone_panel.setAlpha(0);
+          stone_panel_title.setAlpha(0);
+          stone_panel_titlename.setAlpha(0);
+          stone_panel_message.setAlpha(0);
+        }
+      }
+      function toggleAngelPanel(state){
+        if (state){
+          angel_panel_message.setText(twitchData.total.toString() + " Souls have been sacrificed");
+          UIOverlay.setAlpha(0.3);
+          angel_panel.setAlpha(1);
+          angel_panel_message.setAlpha(1);
+        }else{
+          UIOverlay.setAlpha(0);
+          angel_panel.setAlpha(0);
+          angel_panel_message.setAlpha(0);
+        }
+      }
+      function spawnGhost(ghost, context){
+        if (ghost.Image.alpha >= 0.4){
+          return true;
+        }else{
+          ghost.Image.setAlpha(ghost.Image.alpha + 0.005);
+          return false;
+        }
+      }
+      function dieGhost(ghost, context){
+        if (ghost.Image.alpha <= 0){
+          ghost.Image.destroy();
+          ghost.Text.destroy();
+          ghosts.shift();
+        }else{
+          ghost.Image.setAlpha(ghost.Image.alpha - 0.005);
+        }
+      }
+      function moveGhost(ghost, context){
+        if (ghost.Image.x < ghost.StartX - ghost.OffsetX){
+          ghost.SpeedX = ghost.SpeedX * -1;
+          ghost.Image.flipX = true;
+        } else if (ghost.StartX + ghost.OffsetX < ghost.Image.x){
+          ghost.SpeedX = ghost.SpeedX * -1;
+          ghost.Image.flipX = false;
+        }
+
+        if (ghost.Image.y < ghost.StartY - ghost.OffsetY){
+          ghost.SpeedY = ghost.SpeedY * -1;
+        } else if (ghost.StartY + ghost.OffsetY < ghost.Image.y){
+          ghost.SpeedY = ghost.SpeedY * -1;
+        }
+
+        ghost.Image.x += ghost.SpeedX;
+        ghost.Image.y += ghost.SpeedY;
+        ghost.Text.x = ghost.Image.x;
+        ghost.Text.y = ghost.Image.y - ghost.Image.height / 4;
+      }
+      function addGhost(context){
+        if (ghosts.length < 15 && twitchData.souls.length > 0){
+          var randomStone = Math.floor(Math.random()*stones.length);
+          var randomDirection = Math.floor(Math.random()*2);
+          var speed = 0;
+          if (randomDirection == 0){
+            speed = -1;
+          }else{
+            speed = 1;
+          }
+
+          var ghost = {
+              Name: twitchData.souls[0].name,
+              SpeedY: -0.3,
+              SpeedX: speed,
+              StartY: stones[randomStone].y,
+              StartX: stones[randomStone].x,
+              OffsetY: 10,
+              OffsetX: 300,
+              Layer: stones[randomStone].depth,
+              Size: 0.3,
+              Image: "",
+              Text: "",
+              Anim: "spawn",
+              Message: twitchData.souls[0].message
+            };
+
+          ghost.Image = context.add.image(ghost.StartX, ghost.StartY, 'ghost');
+          ghost.Image.setScale(placeResponsive(ghost.Size, "width"), placeResponsive(ghost.Size, "height"));
+          ghost.Image.setInteractive();
+          ghost.Image.on('pointerover', function(pointer, gameObject){
+                ghost.Image.setScale(placeResponsive(ghost.Size + 0.02, "width"), placeResponsive(ghost.Size + 0.02, "height"));
+                ghost.Image.setAlpha(0.6);
+            });
+          ghost.Image.on('pointerout', function(pointer, gameObject){
+                ghost.Image.setScale(placeResponsive(ghost.Size - 0.02, "width"), placeResponsive(ghost.Size - 0.02, "height"));
+                ghost.Image.setAlpha(0.3);
+            });
+          ghost.Image.on('pointerdown', function(pointer, gameObject){
+                toggleStonePanel(true, ghost.Name, ghost.Message);
+            });
+          ghost.Image.setAlpha(0.02);
+          ghost.Image.setDepth(ghost.Layer);
+          if (ghost.SpeedX == -1){
+            ghost.Image.flipX = false;
+          }else{
+            ghost.Image.flipX = true;
+          }
+          ghost.Text = context.add.text(ghost.StartX, ghost.StartY - ghost.Image.height / 4, ghost.Name, { fontFamily: 'Arial', color: '#FFF569' });
+          ghost.Text.setOrigin(0.5);
+          ghost.Text.setDepth(ghost.Layer);
+
+          ghosts.push(ghost);
+          twitchData.souls.shift();
+        }else if(ghosts.length >= 5){
+          if (ghosts[0].Anim !== "die"){
+            ghosts[0].Anim = "die";
+          }
+        }
+
+        setTimeout(function () {
+          addGhost(context);
+        }, (Math.random() * (70 - 40) + 40) * 100);
+      }
+
+      function placeResponsive(unit, unitType){
+        var baseWidth = 1894;
+        var baseHeight = 936;
+        var val = 0;
+
+        if (unitType === "width"){
+          val = (unit / baseWidth) * screenWidth;
+          console.log("before:" + baseWidth.toString() + "|after:" + screenWidth);
+        }else if (unitType === "height"){
+          val = (unit / baseHeight) * screenHeight;
+          console.log("before:" + baseHeight.toString() + "|after:" + screenHeight);
+        }
+
+        console.log("before:" + unit.toString() + "|after:" + val.toString());
+        return val;
+      }
+
+      function updateTwitchData(context){
+        $.ajax({
+            url: "backend/api.php",
+            data: {
+                "method": "getBloodmapData",
+                "cursor": ""
+            },
+            cache: false,
+            type: "GET",
+            success: function(response) {
+              responseParsed = JSON.parse(response);
+              twitchData.total = responseParsed.total;
+              twitchData.cursor = responseParsed.cursor;
+              twitchData.souls = twitchData.souls.concat(responseParsed.souls);
+              console.log(twitchData.souls);
+              setTimeout(function () {
+                updateTwitchData(context);
+              }, 20000);
+            },
+            error: function(xhr) {
+
+            }
+        });
+      }
+  </script>
+
+</body>
+</html>
