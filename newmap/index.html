@@ -335,19 +335,16 @@
 
         if (unitType === "width"){
           val = (unit / baseWidth) * screenWidth;
-          console.log("before:" + baseWidth.toString() + "|after:" + screenWidth);
         }else if (unitType === "height"){
           val = (unit / baseHeight) * screenHeight;
-          console.log("before:" + baseHeight.toString() + "|after:" + screenHeight);
         }
 
-        console.log("before:" + unit.toString() + "|after:" + val.toString());
         return val;
       }
 
       function updateTwitchData(context){
         $.ajax({
-            url: "backend/api.php",
+            url: "https://lysergixdev.com/Newmap/backend/api.php",
             data: {
                 "method": "getBloodmapData",
                 "cursor": ""
