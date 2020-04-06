@@ -344,10 +344,10 @@
 
       function updateTwitchData(context){
         $.ajax({
-            url: "https://lysergixdev.com/Newmap/backend/api.php",
+            url: "https://lysergixdev.com/bloodmap/api.php",
             data: {
                 "method": "getBloodmapData",
-                "cursor": twitchData.total
+                "cursor": twitchData.total.toString()
             },
             cache: false,
             type: "GET",
