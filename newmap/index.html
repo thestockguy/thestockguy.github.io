@@ -67,7 +67,6 @@
           this.load.image('ghost', 'img/graveyard_ghost.png');
 
           this.load.audio('horror_gong', 'audio/horror_gong.mp3');
-          this.load.audio('horror_ambient', 'audio/horror_ambient.mp3');
       }
 
       function create ()
@@ -75,8 +74,6 @@
           gameContext = this;
 
           gameSound_horror_gong = this.sound.add('horror_gong');
-          gameSound_horror_ambient = this.sound.add('horror_ambient', {volume: 1, loop: true});
-          gameSound_horror_ambient.play();
 
           this.bg = this.add.image(screenWidth / 2, screenHeight / 2, 'background');
           this.bg.setDisplaySize(screenWidth, screenHeight);
@@ -191,6 +188,9 @@
           angel_panel_message.setScale(placeResponsive(1, "width"), placeResponsive(1, "height"));
           angel_panel_message.setAlpha(0);
 
+          
+          this.load.audio('horror_ambient', 'audio/horror_ambient.mp3').on('filecomplete', () => this.sound.add('horror_ambient', {volume: 1, loop: true}).play()).start();
+          
           this.cursors = this.input.keyboard.createCursorKeys();
           updateTwitchData(this);
           addGhost(this);
