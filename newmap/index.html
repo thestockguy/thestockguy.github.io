@@ -19,7 +19,7 @@
 
       var ghosts = [];
       var stones = [];
-      var twitchData = {"total": 0, "souls": [], "cursor": ""};
+      var twitchData = {"total": 0, "souls": []};
       var screenWidth = window.innerWidth;
       var screenHeight = window.innerHeight;
 
@@ -347,14 +347,13 @@
             url: "https://lysergixdev.com/Newmap/backend/api.php",
             data: {
                 "method": "getBloodmapData",
-                "cursor": ""
+                "cursor": twitchData.total
             },
             cache: false,
             type: "GET",
             success: function(response) {
               responseParsed = JSON.parse(response);
               twitchData.total = responseParsed.total;
-              twitchData.cursor = responseParsed.cursor;
               twitchData.souls = twitchData.souls.concat(responseParsed.souls);
               console.log(twitchData.souls);
               setTimeout(function () {
