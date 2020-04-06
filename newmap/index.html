@@ -63,6 +63,8 @@
           this.load.image('stone_5', 'img/graveyard_stone_5.png');
           this.load.image('stone_panel', 'img/graveyard_stone_panel.png');
           this.load.image('ghost', 'img/graveyard_ghost.png');
+
+          this.load.audio('horror_gong', 'audio/horror_gong.mp3');
       }
 
       function create ()
@@ -301,6 +303,8 @@
               Anim: "spawn",
               Message: twitchData.souls[0].description
             };
+
+          context.sound.play("horror_gong");
 
           ghost.Image = context.add.image(ghost.StartX, ghost.StartY, 'ghost');
           ghost.Image.setScale(placeResponsive(ghost.Size, "width"), placeResponsive(ghost.Size, "height"));
