@@ -23,6 +23,7 @@
 
       var ghosts = [];
       var stones = [];
+      var isSoundPlaying = false;
       var twitchData = {"total": -1, "souls": []};
       var screenWidth = window.innerWidth;
       var screenHeight = window.innerHeight;
@@ -304,7 +305,10 @@
               Message: twitchData.souls[0].description
             };
 
-          context.sound.play("horror_gong");
+          if (!isSoundPlaying){
+            context.sound.play("horror_gong");
+            isSoundPlaying = true;
+          }
 
           ghost.Image = context.add.image(ghost.StartX, ghost.StartY, 'ghost');
           ghost.Image.setScale(placeResponsive(ghost.Size, "width"), placeResponsive(ghost.Size, "height"));
