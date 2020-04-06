@@ -23,7 +23,7 @@
 
       var ghosts = [];
       var stones = [];
-      var gameSound = null;
+      var gameSound_horror_gong = null;
       var twitchData = {"total": -1, "souls": []};
       var screenWidth = window.innerWidth;
       var screenHeight = window.innerHeight;
@@ -71,6 +71,8 @@
       function create ()
       {
           gameContext = this;
+
+          gameSound_horror_gong = this.sound.add('horror_gong');
 
           this.bg = this.add.image(screenWidth / 2, screenHeight / 2, 'background');
           this.bg.setDisplaySize(screenWidth, screenHeight);
@@ -305,8 +307,8 @@
               Message: twitchData.souls[0].description
             };
 
-          if (gameSound === null){
-            gameSound = context.sound.play("horror_gong");
+          if (!gameSound_horror_gong.isPlaying){
+            gameSound_horror_gong.play();
           }
 
           ghost.Image = context.add.image(ghost.StartX, ghost.StartY, 'ghost');
@@ -344,7 +346,7 @@
 
         setTimeout(function () {
           addGhost(context);
-        }, 20000);
+        }, 2000);
       }
 
       function placeResponsive(unit, unitType){
