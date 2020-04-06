@@ -23,6 +23,7 @@
 
       var ghosts = [];
       var stones = [];
+      var spawnStone = 0;
       var gameSound_horror_gong = null;
       var twitchData = {"total": -1, "souls": []};
       var screenWidth = window.innerWidth;
@@ -282,7 +283,6 @@
       }
       function addGhost(context){
         if (ghosts.length < 15 && twitchData.souls.length > 0){
-          var randomStone = Math.floor(Math.random()*stones.length);
           var randomDirection = Math.floor(Math.random()*2);
           var speed = 0;
           if (randomDirection == 0){
@@ -294,12 +294,17 @@
           var randomOffsetXMin = placeResponsive(10, "width");
           var randomOffsetXMax = placeResponsive(30, "width");
           var randomOffsetX = Math.floor(Math.random()*(randomOffsetXMax-randomOffsetXMin+1)+randomOffsetXMin) * 10;
+            
+          if (spawnStone > 5){
+              spawnStone = 0;
+          }
+            
           var ghost = {
               Name: twitchData.souls[0].name,
               SpeedY: -0.3,
               SpeedX: speed,
-              StartY: stones[randomStone].y,
-              StartX: stones[randomStone].x,
+              StartY: stones[spawnStone].y,
+              StartX: stones[spawnStone].x,
               OffsetY: 10,
               OffsetX: randomOffsetX,
               Layer: stones[randomStone].depth,
@@ -339,6 +344,7 @@
           ghost.Text.setOrigin(0.5);
           ghost.Text.setDepth(ghost.Layer);
 
+          spawnStone += 1;
           ghosts.push(ghost);
           twitchData.souls.shift();
         }else if(ghosts.length >= 15){
