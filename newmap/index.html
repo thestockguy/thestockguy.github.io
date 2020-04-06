@@ -23,7 +23,7 @@
 
       var ghosts = [];
       var stones = [];
-      var isSoundPlaying = false;
+      var gameSound = null;
       var twitchData = {"total": -1, "souls": []};
       var screenWidth = window.innerWidth;
       var screenHeight = window.innerHeight;
@@ -305,9 +305,8 @@
               Message: twitchData.souls[0].description
             };
 
-          if (!isSoundPlaying){
-            context.sound.play("horror_gong");
-            isSoundPlaying = true;
+          if (gameSound === null){
+            gameSound = context.sound.play("horror_gong");
           }
 
           ghost.Image = context.add.image(ghost.StartX, ghost.StartY, 'ghost');
