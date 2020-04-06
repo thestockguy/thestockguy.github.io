@@ -291,6 +291,9 @@
             speed = 1;
           }
 
+          var randomOffsetXMin = placeResponsive(10, "width");
+          var randomOffsetXMax = placeResponsive(30, "width");
+          var randomOffsetX = Math.floor(Math.random()*(randomOffsetXMax-randomOffsetXMin+1)+randomOffsetXMin) * 10;
           var ghost = {
               Name: twitchData.souls[0].name,
               SpeedY: -0.3,
@@ -298,7 +301,7 @@
               StartY: stones[randomStone].y,
               StartX: stones[randomStone].x,
               OffsetY: 10,
-              OffsetX: 300,
+              OffsetX: randomOffsetX,
               Layer: stones[randomStone].depth,
               Size: 0.3,
               Image: "",
