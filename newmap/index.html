@@ -14,12 +14,16 @@
 <body>
 
   <a id="openBloodmap" href="http://hisz.rsoe.hu/alertmap/index2.php" style="display: none" target="_blank"></a>
+  <div style="position: fixed; bottom: 0; padding: 10px;">
+    <a href="https://www.freepik.com/free-vector/cemetery-landscape-night_6428672.htm" style="color: white;" target="_blank">Graveyard designed by upklyak</a><br>
+    <a href="https://www.freepik.com/free-vector/set-funny-ghosts_1317902.htm" style="color: white;" target="_blank">Ghost designed by freepik</a>
+  </div>
 
   <script type="text/javascript">
 
       var ghosts = [];
       var stones = [];
-      var twitchData = {"total": 0, "souls": []};
+      var twitchData = {"total": -1, "souls": []};
       var screenWidth = window.innerWidth;
       var screenHeight = window.innerHeight;
 
@@ -47,7 +51,8 @@
       {
           this.load.image('background', 'img/graveyard_empty.png');
           this.load.image('ui_overlay', 'img/ui_overlay.png');
-          this.load.image('angel', 'img/graveyard_angel.png');
+          this.load.image('angel_2', 'img/graveyard_angel.png');
+          this.load.image('angel', 'img/graveyard_angel_malding.png');
           this.load.image('angel_panel', 'img/graveyard_angel_panel.png');
           this.load.image('door', 'img/graveyard_door.png');
           this.load.image('room', 'img/graveyard_room.png');
@@ -55,6 +60,7 @@
           this.load.image('stone_2', 'img/graveyard_stone_2.png');
           this.load.image('stone_3', 'img/graveyard_stone_3.png');
           this.load.image('stone_4', 'img/graveyard_stone_4.png');
+          this.load.image('stone_5', 'img/graveyard_stone_5.png');
           this.load.image('stone_panel', 'img/graveyard_stone_panel.png');
           this.load.image('ghost', 'img/graveyard_ghost.png');
       }
@@ -139,9 +145,8 @@
           stones[4].flipX = true;
           stones[4].setDepth(5);
 
-          stones.push(this.add.image(placeResponsive(1350, "width"), placeResponsive(500, "height"), 'stone_2'));
+          stones.push(this.add.image(placeResponsive(1350, "width"), placeResponsive(500, "height"), 'stone_5'));
           stones[5].setScale(placeResponsive(0.4, "width"), placeResponsive(0.4, "height"));
-          stones[5].flipX = true;
           stones[5].setDepth(4);
 
           stone_panel = this.add.image(screenWidth / 2, screenHeight / 2, 'stone_panel');
@@ -155,7 +160,7 @@
           stone_panel_title.setOrigin(0.5);
           stone_panel_title.setScale(placeResponsive(1, "width"), placeResponsive(1, "height"));
           stone_panel_title.setAlpha(0);
-          stone_panel_titlename = this.add.text(stone_panel.x, stone_panel.y - placeResponsive(40, "height"), "", { fontFamily: 'Arial', color: '#6B5578', fontSize: "30px" });
+          stone_panel_titlename = this.add.text(stone_panel.x, stone_panel.y - placeResponsive(25, "height"), "", { fontFamily: 'Arial', color: '#6B5578', fontSize: "30px" });
           stone_panel_titlename.setDepth(101);
           stone_panel_titlename.setOrigin(0.5);
           stone_panel_titlename.setScale(placeResponsive(1, "width"), placeResponsive(1, "height"));
@@ -216,7 +221,14 @@
       }
       function toggleAngelPanel(state){
         if (state){
-          angel_panel_message.setText(twitchData.total.toString() + " Souls have been sacrificed");
+          var text = "";
+          if (twitchData.total > 1){
+            text = twitchData.total.toString() + " Souls have been sacrificed";
+          }else{
+            text = twitchData.total.toString() + " Soul has been sacrificed";
+          }
+
+          angel_panel_message.setText(text);
           UIOverlay.setAlpha(0.3);
           angel_panel.setAlpha(1);
           angel_panel_message.setAlpha(1);
@@ -287,7 +299,7 @@
               Image: "",
               Text: "",
               Anim: "spawn",
-              Message: twitchData.souls[0].message
+              Message: twitchData.souls[0].description
             };
 
           ghost.Image = context.add.image(ghost.StartX, ghost.StartY, 'ghost');
@@ -311,7 +323,7 @@
           }else{
             ghost.Image.flipX = true;
           }
-          ghost.Text = context.add.text(ghost.StartX, ghost.StartY - ghost.Image.height / 4, ghost.Name, { fontFamily: 'Arial', color: '#FFF569' });
+          ghost.Text = context.add.text(ghost.StartX, ghost.Image.y - ghost.Image.height / 4, ghost.Name, { fontFamily: 'Arial', color: '#FFF569' });
           ghost.Text.setOrigin(0.5);
           ghost.Text.setDepth(ghost.Layer);
 
@@ -325,7 +337,7 @@
 
         setTimeout(function () {
           addGhost(context);
-        }, (Math.random() * (70 - 40) + 40) * 100);
+        }, 2000);
       }
 
       function placeResponsive(unit, unitType){
@@ -347,18 +359,21 @@
             url: "https://lysergixdev.com/bloodmap/api.php",
             data: {
                 "method": "getBloodmapData",
-                "cursor": twitchData.total.toString()
+                "cursor": (twitchData.total + 1).toString()
             },
             cache: false,
             type: "GET",
             success: function(response) {
               responseParsed = JSON.parse(response);
-              twitchData.total = responseParsed.total;
+              console.log(twitchData.total + 1);
+              console.log(responseParsed);
+              if (responseParsed.total > 0){
+                twitchData.total = parseInt(responseParsed.total);
+              }
               twitchData.souls = twitchData.souls.concat(responseParsed.souls);
-              console.log(twitchData.souls);
               setTimeout(function () {
                 updateTwitchData(context);
-              }, 20000);
+              }, 15000);
             },
             error: function(xhr) {
 
